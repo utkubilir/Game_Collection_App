@@ -7,7 +7,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-
 public class AdminPanelController {
 
     @FXML
@@ -15,10 +14,9 @@ public class AdminPanelController {
 
     @FXML
     void kullanicilariYonetButonAction(ActionEvent event) {
-        loadPage("KullaniciYonetim.fxml");
+        loadPage("/KullaniciYonetim.fxml");
     }
 
-    
     @FXML
     void oyunlariDuzenleButonAction(ActionEvent event) {
         System.out.println("Oyunları düzenle sayfası açılıyor...");
@@ -35,7 +33,6 @@ public class AdminPanelController {
             Node page = FXMLLoader.load(getClass().getResource(fxmlFileName));
             
             anaIcerikPane.getChildren().clear();
-            
             anaIcerikPane.getChildren().add(page);
 
         } catch (IOException e) {
