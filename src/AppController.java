@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+
 public class AppController {
 
     @FXML
@@ -30,7 +31,7 @@ public class AppController {
     @FXML
     private Button registerButton;
 
-    
+   
     @FXML
     private void handleLoginButtonAction(ActionEvent event) {
         String username = usernameField.getText();
@@ -50,29 +51,21 @@ public class AppController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("KayitFormu.fxml"));
             Parent root = loader.load();
-
             Stage registerStage = new Stage();
             registerStage.setTitle("Yeni Kullanıcı Kaydı");
             registerStage.setScene(new Scene(root));
-
-            // Ana pencereye müdahale edilmesini engellemek için modal yap
             registerStage.initModality(Modality.APPLICATION_MODAL);
-            
-            // Yeni pencereyi göster ve kapanmasını bekle
             registerStage.showAndWait();
-
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Hata", "Kayıt formu açılamadı! FXML dosyasının doğru yerde olduğundan emin olun.");
+            showAlert(Alert.AlertType.ERROR, "Hata", "Kayıt formu açılamadı!");
         }
     }
 
-   
+ 
     private void validateLogin(String username, String password) {
-       
-        String sql = "SELECT * FROM kullanicilar WHERE kullanici_adi = ? AND sifre = ?";
+        String sql = "SELECT is_admin FROM kullanicilar WHERE kullanici_adi = ? AND sifre = ?";
 
-        
         try (Connection conn = VeritabaniBaglantisi.baglan();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -81,16 +74,23 @@ public class AppController {
                 return;
             }
 
-           
             pstmt.setString(1, username);
             pstmt.setString(2, password);
 
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                showAlert(Alert.AlertType.INFORMATION, "Giriş Başarılı", "Hoş geldiniz, " + username + "!");
-                System.out.println("Kullanıcı başarıyla giriş yaptı.");
-                
+                boolean isAdmin = rs.getBoolean("is_admin");
+
+                Stage loginStage = (Stage) loginButton.getScene().getWindow();
+                loginStage.close();
+
+                if (isAdmin) {
+                    openAdminPanel();
+                } else {
+             
+                    showAlert(Alert.AlertType.INFORMATION, "Giriş Başarılı", "Hoş geldiniz, " + username + "!");
+                }
             } else {
                 showAlert(Alert.AlertType.ERROR, "Giriş Hatası", "Kullanıcı adı veya şifre yanlış!");
             }
@@ -101,7 +101,22 @@ public class AppController {
         }
     }
 
+  
+    private void openAdminPanel() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("AdminPanel.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Admin Paneli");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Kritik Hata", "Admin paneli yüklenemedi!");
+        }
+    }
     
+   
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
