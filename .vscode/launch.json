@@ -1,0 +1,21 @@
+{
+  
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "App",
+            "projectName": "OyunKataloğu_2ffefe72",
+             "vmArgs": "--module-path /Users/utkubilir/Desktop/javafx-sdk-24.0.1/lib --add-modules javafx.controls,javafx.fxml"
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+{
+    "java.project.sourcePaths": ["src"],
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "/Users/utkubilir/Desktop/javafx-sdk-24.0.1/lib/javafx-swt.jar",
+        "/Users/utkubilir/Desktop/javafx-sdk-24.0.1/lib/javafx.base.jar",
+        "/Users/utkubilir/Desktop/javafx-sdk-24.0.1/lib/javafx.controls.jar",
+        "/Users/utkubilir/Desktop/javafx-sdk-24.0.1/lib/javafx.fxml.jar",
+        "/Users/utkubilir/Desktop/javafx-sdk-24.0.1/lib/javafx.graphics.jar",
+        "/Users/utkubilir/Desktop/javafx-sdk-24.0.1/lib/javafx.media.jar",
+        "/Users/utkubilir/Desktop/javafx-sdk-24.0.1/lib/javafx.swing.jar",
+        "/Users/utkubilir/Desktop/javafx-sdk-24.0.1/lib/javafx.web.jar",
+        "/Users/utkubilir/Desktop/javafx-sdk-24.0.1/lib/jdk.jsobject.jar",
+        "/Users/utkubilir/Desktop/javafx-sdk-24.0.1/lib/jfx.incubator.input.jar",
+        "/Users/utkubilir/Desktop/javafx-sdk-24.0.1/lib/jfx.incubator.richtext.jar",
+        "/Users/utkubilir/Desktop/mysql-connector-j-9.3.0.jar"
+    ]
+}
