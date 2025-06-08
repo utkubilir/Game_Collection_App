@@ -1,3 +1,4 @@
+package Controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -18,6 +19,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
+import Util.Kullanici;
+import Util.VeritabaniBaglantisi;
+
+
 public class KullaniciYonetimController implements Initializable {
 
     @FXML
@@ -33,7 +38,7 @@ public class KullaniciYonetimController implements Initializable {
     private TextField aramaKutusu;
 
     @FXML
-    private Button yenileButton; // FXML'e eklenecek yeni buton
+    private Button yenileButton;
 
     private final ObservableList<Kullanici> kullaniciListesi = FXCollections.observableArrayList();
 
@@ -67,15 +72,10 @@ public class KullaniciYonetimController implements Initializable {
         kullaniciTableView.setItems(siralanmisData);
     }
 
-    /**
-     * "Yenile" butonuna tıklandığında bu metot çalışır.
-     * Tablodaki listeyi temizler ve veritabanından yeniden yükler.
-     */
+  
     @FXML
     void yenileButonAction(ActionEvent event) {
-        // Mevcut listeyi temizle
         kullaniciListesi.clear();
-        // Veritabanından verileri taze olarak tekrar yükle
         kullanicilariYukle();
     }
 

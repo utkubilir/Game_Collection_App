@@ -1,3 +1,4 @@
+package Controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +16,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import Util.VeritabaniBaglantisi;
 
 
 public class AppController {
@@ -49,7 +52,7 @@ public class AppController {
     @FXML
     private void handleRegisterButtonAction(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("KayitFormu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/KayitFormu.fxml"));
             Parent root = loader.load();
             Stage registerStage = new Stage();
             registerStage.setTitle("Yeni Kullanıcı Kaydı");
@@ -104,7 +107,7 @@ public class AppController {
   
     private void openAdminPanel() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("AdminPanel.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/AdminPanel.fxml"));
             Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle("Admin Paneli");

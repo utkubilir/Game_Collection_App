@@ -11,9 +11,9 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("LoginScreen.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("Fxml/LoginScreen.fxml"));
 
-            primaryStage.setTitle("Basit JavaFX Uygulaması");
+            primaryStage.setTitle("Game Collection App");
             primaryStage.setScene(new Scene(root, 600, 400));
 
 

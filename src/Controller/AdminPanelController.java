@@ -1,3 +1,4 @@
+package Controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -7,6 +8,8 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import Util.VeritabaniBaglantisi;
+
 public class AdminPanelController {
 
     @FXML
@@ -14,7 +17,7 @@ public class AdminPanelController {
 
     @FXML
     void kullanicilariYonetButonAction(ActionEvent event) {
-        loadPage("/KullaniciYonetim.fxml");
+        loadPage("/Fxml/KullaniciYonetim.fxml");
     }
 
     @FXML
