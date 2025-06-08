@@ -1,4 +1,13 @@
 package Controller;
+
+import Util.UserSession;
+import Util.VeritabaniBaglantisi;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,115 +20,78 @@ import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import Util.VeritabaniBaglantisi;
-
-
 public class AppController {
+    @FXML private TextField usernameField;
+    @FXML private PasswordField passwordField;
+    @FXML private Button loginButton;
 
-    @FXML
-    private TextField usernameField;
-
-    @FXML
-    private PasswordField passwordField;
-
-    @FXML
-    private Button loginButton;
-
-    @FXML
-    private Button registerButton;
-
-   
     @FXML
     private void handleLoginButtonAction(ActionEvent event) {
-        String username = usernameField.getText();
-        String password = passwordField.getText();
-
-        if (username.isEmpty() || password.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Giriş Hatası", "Kullanıcı adı ve şifre alanları boş bırakılamaz!");
-            return;
-        }
-
-        validateLogin(username, password);
+        validateLogin(usernameField.getText(), passwordField.getText());
     }
-
-   
+    
     @FXML
     private void handleRegisterButtonAction(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/KayitFormu.fxml"));
-            Parent root = loader.load();
-            Stage registerStage = new Stage();
-            registerStage.setTitle("Yeni Kullanıcı Kaydı");
-            registerStage.setScene(new Scene(root));
-            registerStage.initModality(Modality.APPLICATION_MODAL);
-            registerStage.showAndWait();
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Hata", "Kayıt formu açılamadı!");
-        }
+        openWindow("/Fxml/KayitFormu.fxml", "Yeni Kullanıcı Kaydı", true);
     }
 
- 
     private void validateLogin(String username, String password) {
-        String sql = "SELECT is_admin FROM kullanicilar WHERE kullanici_adi = ? AND sifre = ?";
-
+        // id, is_admin gibi tüm gerekli bilgileri çekiyoruz.
+        String sql = "SELECT id, is_admin FROM kullanicilar WHERE kullanici_adi = ? AND sifre = ?";
         try (Connection conn = VeritabaniBaglantisi.baglan();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
+            
             if (conn == null) {
                 showAlert(Alert.AlertType.ERROR, "Bağlantı Hatası", "Veritabanı bağlantısı kurulamadı!");
                 return;
             }
-
             pstmt.setString(1, username);
             pstmt.setString(2, password);
-
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
+                int userId = rs.getInt("id");
                 boolean isAdmin = rs.getBoolean("is_admin");
+                
+                // Oturum bilgisini oluşturuyoruz.
+                UserSession.createInstance(userId, username);
 
-                Stage loginStage = (Stage) loginButton.getScene().getWindow();
-                loginStage.close();
+                // Giriş penceresini kapat.
+                ((Stage) loginButton.getScene().getWindow()).close();
 
                 if (isAdmin) {
-                    openAdminPanel();
+                    openWindow("/Fxml/AdminPanel.fxml", "Admin Paneli", false);
                 } else {
-             
-                    showAlert(Alert.AlertType.INFORMATION, "Giriş Başarılı", "Hoş geldiniz, " + username + "!");
+                    openWindow("/Fxml/AnaEkran.fxml", "Oyun Kataloğum", false);
                 }
             } else {
                 showAlert(Alert.AlertType.ERROR, "Giriş Hatası", "Kullanıcı adı veya şifre yanlış!");
             }
-
         } catch (SQLException e) {
+            showAlert(Alert.AlertType.ERROR, "Veritabanı Hatası", "Giriş sırasında bir hata oluştu.");
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Veritabanı Hatası", "Giriş sırasında bir veritabanı hatası oluştu.");
         }
     }
 
-  
-    private void openAdminPanel() {
+    private void openWindow(String fxmlPath, String title, boolean modal) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/AdminPanel.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
             Stage stage = new Stage();
-            stage.setTitle("Admin Paneli");
+            stage.setTitle(title);
             stage.setScene(new Scene(root));
-            stage.show();
+            if (modal) {
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.showAndWait();
+            } else {
+                stage.show();
+            }
         } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Arayüz Hatası", "Ekran yüklenemedi: " + fxmlPath);
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Kritik Hata", "Admin paneli yüklenemedi!");
         }
     }
-    
-   
+
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);

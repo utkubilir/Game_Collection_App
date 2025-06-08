@@ -19,7 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-import Util.Kullanici;
+import Model.Kullanici;
 import Util.VeritabaniBaglantisi;
 
 
