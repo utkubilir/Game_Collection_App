@@ -1,47 +1,74 @@
 package Controller;
 
+import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import java.io.IOException;
-
-import Util.VeritabaniBaglantisi;
 
 public class AdminPanelController {
 
-    @FXML
-    private AnchorPane anaIcerikPane;
+    @FXML private AnchorPane anaIcerikPane;
 
     @FXML
     void kullanicilariYonetButonAction(ActionEvent event) {
-        loadPage("/Fxml/KullaniciYonetim.fxml");
+        loadPageIntoPane("/Fxml/KullaniciYonetim.fxml");
     }
 
     @FXML
-    void oyunlariDuzenleButonAction(ActionEvent event) {
-        System.out.println("Oyunları düzenle sayfası açılıyor...");
+    void tumOyunlariGoruntuleAction(ActionEvent event) {
+        openWindow("/Fxml/TumOyunlar.fxml", "Tüm Kullanıcıların Oyunları");
     }
 
     @FXML
     void cikisYapButonAction(ActionEvent event) {
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Stage stage = (Stage) anaIcerikPane.getScene().getWindow();
         stage.close();
     }
 
-    private void loadPage(String fxmlFileName) {
+  
+    private void loadPageIntoPane(String fxmlFileName) {
         try {
             Node page = FXMLLoader.load(getClass().getResource(fxmlFileName));
-            
             anaIcerikPane.getChildren().clear();
             anaIcerikPane.getChildren().add(page);
-
         } catch (IOException e) {
             System.err.println("Sayfa yüklenirken hata oluştu: " + fxmlFileName);
             e.printStackTrace();
         }
+    }
+    
+   
+    private void openWindow(String fxmlPath, String title) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+            
+          
+            
+            Stage stage = new Stage();
+            stage.setTitle(title);
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.show();
+
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Arayüz Hatası", "Ekran yüklenemedi: " + fxmlPath);
+            e.printStackTrace();
+        }
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

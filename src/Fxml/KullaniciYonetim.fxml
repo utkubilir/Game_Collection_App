@@ -20,7 +20,7 @@
           <TableColumn fx:id="idSutun" prefWidth="50.0" text="ID" />
           <TableColumn fx:id="kullaniciAdiSutun" prefWidth="200.0" text="Kullanıcı Adı" />
             <TableColumn fx:id="kayitTarihiSutun" prefWidth="200.0" text="Kayıt Tarihi" />
-            <TableColumn prefWidth="120.0" text="İşlemler" />
+            <TableColumn fx:id="islemlerSutun" prefWidth="120.0" text="İşlemler" />
         </columns>
       </TableView>
       <TextField fx:id="aramaKutusu" layoutX="425.0" layoutY="14.0" promptText="Kullanıcı ara..." />

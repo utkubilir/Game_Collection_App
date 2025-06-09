@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.TumOyunlarController">
+   <top>
+      <VBox>
+         <children>
+            <Label fx:id="baslikLabel" text="Tüm Kullanıcıların Oyunları">
+               <font><Font name="System Bold" size="24.0" /></font>
+               <VBox.margin>
+                  <Insets bottom="10.0" left="20.0" top="20.0" />
+               </VBox.margin>
+            </Label>
+            <TextField fx:id="aramaKutusu" promptText="Oyun veya kullanıcıya göre ara...">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="20.0" right="20.0" />
+               </VBox.margin>
+            </TextField>
+         </children>
+      </VBox>
+   </top>
+   <center>
+      <TableView fx:id="oyunlarTableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <columns>
+            <TableColumn fx:id="ekleyenKullaniciColumn" prefWidth="150.0" text="Ekleyen Kullanıcı" />
+            <TableColumn fx:id="baslikColumn" prefWidth="250.0" text="Başlık" />
+            <TableColumn fx:id="platformColumn" prefWidth="150.0" text="Platformlar" />
+            <TableColumn fx:id="turColumn" prefWidth="120.0" text="Tür" />
+            <TableColumn fx:id="gelistiriciColumn" prefWidth="150.0" text="Geliştirici" />
+            <TableColumn fx:id="puanColumn" prefWidth="70.0" text="Puan" />
+         </columns>
+         <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+         <BorderPane.margin>
+            <Insets bottom="20.0" left="20.0" right="20.0" />
+         </BorderPane.margin>
+      </TableView>
+   </center>
+</BorderPane>
