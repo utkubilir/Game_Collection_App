@@ -26,7 +26,10 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
@@ -34,17 +37,14 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class AnaEkranController implements Initializable {
 
     @FXML private TableView<Oyun> oyunlarTableView;
-    @FXML private TableColumn<Oyun, String> baslikColumn;
-    @FXML private TableColumn<Oyun, String> platformColumn;
-    @FXML private TableColumn<Oyun, String> turColumn;
-    @FXML private TableColumn<Oyun, String> gelistiriciColumn;
-    @FXML private TableColumn<Oyun, Integer> puanColumn;
-    @FXML private TableColumn<Oyun, String> oynamaSuresiColumn;
-    @FXML private TableColumn<Oyun, Integer> cikisYiliColumn;
+    @FXML private TableColumn<Oyun, String> baslikColumn, platformColumn, turColumn, gelistiriciColumn, oynamaSuresiColumn;
+    @FXML private TableColumn<Oyun, Integer> puanColumn, cikisYiliColumn;
     @FXML private TextField aramaKutusu;
 
     private ObservableList<Oyun> oyunListesi = FXCollections.observableArrayList();
@@ -58,59 +58,13 @@ public class AnaEkranController implements Initializable {
         puanColumn.setCellValueFactory(new PropertyValueFactory<>("rating"));
         oynamaSuresiColumn.setCellValueFactory(new PropertyValueFactory<>("playtime"));
         cikisYiliColumn.setCellValueFactory(new PropertyValueFactory<>("releaseYear"));
-
         oyunlariYukle();
         filtreyiAyarla();
-    }
-    
-    @FXML
-    void handleImportJson(ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("JSON Dosyasını İçe Aktar");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Dosyaları", "*.json"));
-        File file = fileChooser.showOpenDialog(oyunlarTableView.getScene().getWindow());
-
-        if (file != null) {
-            try (FileReader reader = new FileReader(file)) {
-                Gson gson = new Gson();
-                Type oyunListesiTipi = new TypeToken<List<Oyun>>(){}.getType();
-                List<Oyun> iceAktarilanOyunlar = gson.fromJson(reader, oyunListesiTipi);
-
-                if (iceAktarilanOyunlar != null) {
-                    iceAktarilanOyunlar.forEach(this::oyunuVeritabaninaKaydet);
-                    oyunlariYukle();
-                    showAlert(Alert.AlertType.INFORMATION, "Başarılı", iceAktarilanOyunlar.size() + " oyun başarıyla içe aktarıldı.");
-                }
-            } catch (Exception e) {
-                showAlert(Alert.AlertType.ERROR, "Hata", "JSON dosyası okunurken veya işlenirken bir hata oluştu.");
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @FXML
-    void handleExportJson(ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Oyun Listesini Dışa Aktar");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Dosyaları", "*.json"));
-        fileChooser.setInitialFileName("oyun_katalogum.json");
-        File file = fileChooser.showSaveDialog(oyunlarTableView.getScene().getWindow());
-
-        if (file != null) {
-            try (Writer writer = new FileWriter(file)) {
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                gson.toJson(oyunListesi, writer);
-                showAlert(Alert.AlertType.INFORMATION, "Başarılı", "Oyun listeniz başarıyla dışa aktarıldı.");
-            } catch (IOException e) {
-                showAlert(Alert.AlertType.ERROR, "Hata", "Dosya yazılırken bir hata oluştu.");
-                e.printStackTrace();
-            }
-        }
     }
 
     @FXML
     void handleOyunEkle(ActionEvent event) {
-        System.out.println("Oyun Ekle formu açılacak.");
+        openOyunForm(null);
     }
 
     @FXML
@@ -120,7 +74,29 @@ public class AnaEkranController implements Initializable {
             showAlert(Alert.AlertType.WARNING, "Uyarı", "Lütfen düzenlemek için bir oyun seçin.");
             return;
         }
-        System.out.println(seciliOyun.getTitle() + " için Düzenle formu açılacak.");
+        openOyunForm(seciliOyun);
+    }
+    
+    private void openOyunForm(Oyun oyun) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/OyunFormu.fxml"));
+            Parent root = loader.load();
+
+            OyunFormuController controller = loader.getController();
+            controller.setOnFormClosed(this::oyunlariYukle);
+            if (oyun != null) {
+                controller.setDuzenlenecekOyun(oyun);
+            }
+
+            Stage stage = new Stage();
+            stage.setTitle(oyun == null ? "Yeni Oyun Ekle" : "Oyunu Düzenle");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Arayüz Hatası", "Oyun formu yüklenemedi.");
+        }
     }
 
     @FXML
@@ -130,13 +106,10 @@ public class AnaEkranController implements Initializable {
             showAlert(Alert.AlertType.WARNING, "Uyarı", "Lütfen silmek için bir oyun seçin.");
             return;
         }
-        Optional<ButtonType> result = showAlert(Alert.AlertType.CONFIRMATION, "Silme Onayı", 
-                "'" + seciliOyun.getTitle() + "' adlı oyunu silmek istediğinizden emin misiniz?");
-
+        Optional<ButtonType> result = showAlert(Alert.AlertType.CONFIRMATION, "Silme Onayı", "'" + seciliOyun.getTitle() + "' adlı oyunu silmek istediğinizden emin misiniz?");
         if (result.isPresent() && result.get() == ButtonType.OK) {
             String sql = "DELETE FROM oyunlar WHERE id = ? AND kullanici_id = ?";
-            try (Connection conn = VeritabaniBaglantisi.baglan();
-                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            try (Connection conn = VeritabaniBaglantisi.baglan(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setInt(1, seciliOyun.getId());
                 pstmt.setInt(2, UserSession.getInstance().getUserId());
                 if (pstmt.executeUpdate() > 0) {
@@ -153,39 +126,13 @@ public class AnaEkranController implements Initializable {
     private void oyunlariYukle() {
         oyunListesi.clear();
         String sql = "SELECT * FROM oyunlar WHERE kullanici_id = ?";
-        try (Connection conn = VeritabaniBaglantisi.baglan();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = VeritabaniBaglantisi.baglan(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, UserSession.getInstance().getUserId());
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 oyunListesi.add(oyunFromResultSet(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    private void oyunuVeritabaninaKaydet(Oyun oyun) {
-        String sql = "INSERT INTO oyunlar (kullanici_id, title, genre, developer, publisher, platforms, translators, steamid, release_year, playtime, format, language, rating, tags) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        try (Connection conn = VeritabaniBaglantisi.baglan();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setInt(1, UserSession.getInstance().getUserId());
-            pstmt.setString(2, oyun.getTitle());
-            pstmt.setString(3, oyun.getGenre());
-            pstmt.setString(4, oyun.getDeveloper());
-            pstmt.setString(5, oyun.getPublisher());
-            pstmt.setString(6, oyun.getPlatforms());
-            pstmt.setString(7, oyun.getTranslators());
-            pstmt.setString(8, oyun.getSteamid());
-            pstmt.setInt(9, oyun.getReleaseYear());
-            pstmt.setString(10, oyun.getPlaytime());
-            pstmt.setString(11, oyun.getFormat());
-            pstmt.setString(12, oyun.getLanguage());
-            pstmt.setInt(13, oyun.getRating());
-            pstmt.setString(14, oyun.getTags());
-            pstmt.executeUpdate();
-        } catch (SQLException e){
             e.printStackTrace();
         }
     }
@@ -209,6 +156,72 @@ public class AnaEkranController implements Initializable {
         oyun.setTags(rs.getString("tags"));
         return oyun;
     }
+    
+    @FXML void handleImportJson(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("JSON Dosyasını İçe Aktar");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Dosyaları", "*.json"));
+        File file = fileChooser.showOpenDialog(oyunlarTableView.getScene().getWindow());
+
+        if (file != null) {
+            try (FileReader reader = new FileReader(file)) {
+                Gson gson = new Gson();
+                Type oyunListesiTipi = new TypeToken<List<Oyun>>(){}.getType();
+                List<Oyun> iceAktarilanOyunlar = gson.fromJson(reader, oyunListesiTipi);
+
+                if (iceAktarilanOyunlar != null) {
+                    iceAktarilanOyunlar.forEach(this::oyunuVeritabaninaKaydet);
+                    oyunlariYukle();
+                    showAlert(Alert.AlertType.INFORMATION, "Başarılı", iceAktarilanOyunlar.size() + " oyun başarıyla içe aktarıldı.");
+                }
+            } catch (Exception e) {
+                showAlert(Alert.AlertType.ERROR, "Hata", "JSON dosyası okunurken veya işlenirken bir hata oluştu.");
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    @FXML void handleExportJson(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Oyun Listesini Dışa Aktar");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Dosyaları", "*.json"));
+        fileChooser.setInitialFileName("oyun_katalogum.json");
+        File file = fileChooser.showSaveDialog(oyunlarTableView.getScene().getWindow());
+
+        if (file != null) {
+            try (Writer writer = new FileWriter(file)) {
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                gson.toJson(oyunListesi, writer);
+                showAlert(Alert.AlertType.INFORMATION, "Başarılı", "Oyun listeniz başarıyla dışa aktarıldı.");
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR, "Hata", "Dosya yazılırken bir hata oluştu.");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void oyunuVeritabaninaKaydet(Oyun oyun) {
+        String sql = "INSERT INTO oyunlar (kullanici_id, title, genre, developer, publisher, platforms, translators, steamid, release_year, playtime, format, language, rating, tags) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        try (Connection conn = VeritabaniBaglantisi.baglan(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, UserSession.getInstance().getUserId());
+            pstmt.setString(2, oyun.getTitle());
+            pstmt.setString(3, oyun.getGenre());
+            pstmt.setString(4, oyun.getDeveloper());
+            pstmt.setString(5, oyun.getPublisher());
+            pstmt.setString(6, oyun.getPlatforms());
+            pstmt.setString(7, oyun.getTranslators());
+            pstmt.setString(8, oyun.getSteamid());
+            pstmt.setInt(9, oyun.getReleaseYear());
+            pstmt.setString(10, oyun.getPlaytime());
+            pstmt.setString(11, oyun.getFormat());
+            pstmt.setString(12, oyun.getLanguage());
+            pstmt.setInt(13, oyun.getRating());
+            pstmt.setString(14, oyun.getTags());
+            pstmt.executeUpdate();
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
 
     private void filtreyiAyarla() {
         FilteredList<Oyun> filtrelenmisData = new FilteredList<>(oyunListesi, b -> true);
@@ -216,12 +229,10 @@ public class AnaEkranController implements Initializable {
             filtrelenmisData.setPredicate(oyun -> {
                 if (newValue == null || newValue.isEmpty()) return true;
                 String lowerCaseFilter = newValue.toLowerCase();
-                
                 if (oyun.getTitle().toLowerCase().contains(lowerCaseFilter)) return true;
                 if (oyun.getGenre() != null && oyun.getGenre().toLowerCase().contains(lowerCaseFilter)) return true;
                 if (oyun.getPlatforms() != null && oyun.getPlatforms().toLowerCase().contains(lowerCaseFilter)) return true;
                 if (oyun.getTags() != null && oyun.getTags().toLowerCase().contains(lowerCaseFilter)) return true;
-
                 return false; 
             });
         });
