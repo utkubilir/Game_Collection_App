@@ -14,6 +14,7 @@
         "/Users/utkubilir/Desktop/javafx-sdk-24.0.1/lib/jdk.jsobject.jar",
         "/Users/utkubilir/Desktop/javafx-sdk-24.0.1/lib/jfx.incubator.input.jar",
         "/Users/utkubilir/Desktop/javafx-sdk-24.0.1/lib/jfx.incubator.richtext.jar",
-        "/Users/utkubilir/Desktop/mysql-connector-j-9.3.0.jar"
+        "/Users/utkubilir/Desktop/mysql-connector-j-9.3.0.jar",
+        "/Users/utkubilir/Desktop/gson-2.10.1.jar"
     ]
 }

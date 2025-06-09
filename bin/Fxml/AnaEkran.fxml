@@ -3,6 +3,9 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -15,6 +18,16 @@
    <top>
       <VBox prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
+            <MenuBar>
+              <menus>
+                <Menu mnemonicParsing="false" text="Dosya">
+                  <items>
+                    <MenuItem mnemonicParsing="false" onAction="#handleImportJson" text="JSON İçe Aktar" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleExportJson" text="JSON Dışa Aktar" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
             <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
                <children>
                   <Label text="Oyun Kataloğum">
@@ -24,7 +37,7 @@
                   </Label>
                </children>
                <padding>
-                  <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
+                  <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
                </padding>
             </HBox>
             <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="200.0" spacing="10.0">
@@ -34,9 +47,6 @@
                   <Button fx:id="oyunDuzenleButton" mnemonicParsing="false" onAction="#handleOyunDuzenle" prefHeight="30.0" text="Seçili Oyunu Düzenle" />
                   <Button fx:id="oyunSilButton" mnemonicParsing="false" onAction="#handleOyunSil" prefHeight="30.0" style="-fx-background-color: #dc3545; -fx-text-fill: white;" text="Seçili Oyunu Sil" />
                </children>
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
                <padding>
                   <Insets bottom="10.0" left="20.0" right="20.0" />
                </padding>
