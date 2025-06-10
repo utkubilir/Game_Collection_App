@@ -5,27 +5,51 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="350.0" spacing="15.0" style="-fx-background-color: #f0f0f0;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.KayitController">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="450.0" spacing="15.0" style="-fx-background-color: #f4f4f4;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.KayitController">
    <children>
       <Label text="Yeni Kullanıcı Kaydı">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <TextField fx:id="kullaniciAdiField" maxWidth="200.0" promptText="Kullanıcı Adı" />
-      <PasswordField fx:id="sifreField" maxWidth="200.0" promptText="Şifre" />
-      <PasswordField fx:id="sifreTekrarField" maxWidth="200.0" promptText="Şifre Tekrar" />
-      <Button fx:id="kayitOlButton" mnemonicParsing="false" onAction="#handleKayitOlButtonAction" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="Kayıt Ol">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font>
-      </Button>
-      <Label fx:id="hataLabel" textFill="RED" />
+      <VBox prefWidth="100.0" spacing="5.0">
+         <children>
+            <Label text="Kullanıcı Adı" />
+            <TextField fx:id="kullaniciAdiField" prefHeight="40.0" promptText="Bir kullanıcı adı belirleyin" />
+         </children>
+      </VBox>
+      <VBox prefWidth="100.0" spacing="5.0">
+         <children>
+            <Label text="Şifre" />
+            <PasswordField fx:id="sifreField" prefHeight="40.0" promptText="Şifrenizi girin" />
+         </children>
+      </VBox>
+      <VBox prefWidth="100.0" spacing="5.0">
+         <children>
+            <Label text="Şifre Tekrar" />
+            <PasswordField fx:id="sifreTekrarField" prefHeight="40.0" promptText="Şifrenizi tekrar girin" />
+            <Label fx:id="validationStatusLabel" managed="false" visible="false" />
+         </children>
+      </VBox>
+      <VBox alignment="CENTER" spacing="10.0">
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin>
+         <children>
+            <Button fx:id="kayitOlButton" defaultButton="true" mnemonicParsing="false" onAction="#handleKayitOlButtonAction" prefHeight="45.0" prefWidth="200.0" style="-fx-background-color: #28a745; -fx-text-fill: white;" text="Kayıt Ol">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#handleGirisEkraninaDon" style="-fx-background-color: transparent;" text="Zaten bir hesabın var mı? Giriş Yap" underline="true" />
+         </children>
+      </VBox>
    </children>
    <padding>
-      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+      <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
    </padding>
 </VBox>
