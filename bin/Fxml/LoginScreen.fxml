@@ -1,33 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
-
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="433.0" prefWidth="620.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AppController">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="400.0" spacing="15.0" style="-fx-background-color: #f4f4f4;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AppController">
    <children>
-      <Text layoutX="144.0" layoutY="88.0" strokeType="OUTSIDE" strokeWidth="0.0" text="WELCOME TO GAME CATALOG" textAlignment="CENTER" wrappingWidth="332.21630859375">
+      <Label text="Oyun Kataloğu">
          <font>
-            <Font size="36.0" />
+            <Font name="System Bold" size="28.0" />
          </font>
-      </Text>
-      <Text layoutX="152.0" layoutY="218.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UserName:">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Text>
-      <Text layoutX="162.0" layoutY="247.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Password:">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Text>
-      <TextField fx:id="usernameField" layoutX="275.0" layoutY="197.0" promptText="kullanıcı adı" />
-      <Button fx:id="loginButton" layoutX="380.0" layoutY="265.0" mnemonicParsing="false" onAction="#handleLoginButtonAction" text="Giriş Yap" />
-      <Button fx:id="registerButton" layoutX="476.0" layoutY="265.0" mnemonicParsing="false" onAction="#handleRegisterButtonAction" text="Kayıt Ol" />
-      <PasswordField fx:id="passwordField" layoutX="275.0" layoutY="225.0" />
+      </Label>
+      <VBox spacing="10.0">
+         <children>
+            <Label text="Kullanıcı Adı" />
+            <TextField fx:id="usernameField" prefHeight="40.0" promptText="Kullanıcı adınızı girin" />
+         </children>
+      </VBox>
+      <VBox spacing="10.0">
+         <children>
+            <Label text="Şifre" />
+            <HBox alignment="CENTER_LEFT" spacing="5.0">
+               <children>
+                  <StackPane HBox.hgrow="ALWAYS">
+                     <children>
+                        <PasswordField fx:id="passwordField" onKeyPressed="#handleKeyPressed" prefHeight="40.0" promptText="Şifrenizi girin" />
+                        <TextField fx:id="visiblePasswordField" managed="false" onKeyPressed="#handleKeyPressed" prefHeight="40.0" promptText="Şifrenizi girin" visible="false" />
+                     </children>
+                  </StackPane>
+                  <Button fx:id="togglePasswordButton" mnemonicParsing="false" onAction="#togglePasswordVisibility" prefHeight="40.0" prefWidth="70.0" text="Göster" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <VBox alignment="CENTER" spacing="10.0">
+         <children>
+            <!-- YENİ EKLENEN HATA ETİKETİ -->
+            <Label fx:id="errorLabel" managed="false" text="Hata Mesajı" textFill="RED" visible="false">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
+            <Button fx:id="loginButton" defaultButton="true" mnemonicParsing="false" onAction="#handleLoginButtonAction" prefHeight="45.0" prefWidth="200.0" style="-fx-background-color: #007bff; -fx-text-fill: white;" text="Giriş Yap">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#handleRegisterButtonAction" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="Hesabın yok mu? Kayıt Ol" underline="true" />
+         </children>
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin>
+      </VBox>
    </children>
-</Pane>
+   <padding>
+      <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+   </padding>
+</VBox>
