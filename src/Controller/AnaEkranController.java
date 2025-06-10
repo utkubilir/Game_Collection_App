@@ -1,6 +1,7 @@
 package Controller;
 
 import Model.Oyun;
+import Util.LogYoneticisi;
 import Util.UserSession;
 import Util.VeritabaniBaglantisi;
 import com.google.gson.Gson;
@@ -113,6 +114,7 @@ public class AnaEkranController implements Initializable {
                 pstmt.setInt(1, seciliOyun.getId());
                 pstmt.setInt(2, UserSession.getInstance().getUserId());
                 if (pstmt.executeUpdate() > 0) {
+                    LogYoneticisi.logla(UserSession.getInstance().getUserId(), "'" + seciliOyun.getTitle() + "' adlı oyunu sildi.");
                     oyunListesi.remove(seciliOyun);
                     showAlert(Alert.AlertType.INFORMATION, "Başarılı", "Oyun başarıyla silindi.");
                 }

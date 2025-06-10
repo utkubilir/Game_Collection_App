@@ -1,8 +1,8 @@
 package Controller;
 
+import Util.LogYoneticisi;
 import Util.UserSession;
 import Util.VeritabaniBaglantisi;
-
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -36,7 +36,6 @@ public class AppController {
     }
 
     private void validateLogin(String username, String password) {
-        // id, is_admin gibi tüm gerekli bilgileri çekiyoruz.
         String sql = "SELECT id, is_admin FROM kullanicilar WHERE kullanici_adi = ? AND sifre = ?";
         try (Connection conn = VeritabaniBaglantisi.baglan();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -53,10 +52,9 @@ public class AppController {
                 int userId = rs.getInt("id");
                 boolean isAdmin = rs.getBoolean("is_admin");
                 
-                // Oturum bilgisini oluşturuyoruz.
                 UserSession.createInstance(userId, username);
+                LogYoneticisi.logla(userId, "Sisteme giriş yaptı.");
 
-                // Giriş penceresini kapat.
                 ((Stage) loginButton.getScene().getWindow()).close();
 
                 if (isAdmin) {

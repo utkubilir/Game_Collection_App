@@ -1,6 +1,7 @@
 package Controller;
 
 import Model.Oyun;
+import Util.LogYoneticisi;
 import Util.UserSession;
 import Util.VeritabaniBaglantisi;
 import java.sql.Connection;
@@ -80,6 +81,7 @@ public class OyunFormuController {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             prepareStatament(pstmt, false);
             pstmt.executeUpdate();
+            LogYoneticisi.logla(UserSession.getInstance().getUserId(), "'" + titleField.getText() + "' adlı yeni bir oyun ekledi.");
             showAlert(Alert.AlertType.INFORMATION, "Başarılı", "Oyun başarıyla eklendi.");
         }
     }
@@ -90,6 +92,7 @@ public class OyunFormuController {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             prepareStatament(pstmt, true);
             pstmt.executeUpdate();
+            LogYoneticisi.logla(UserSession.getInstance().getUserId(), "'" + titleField.getText() + "' adlı oyunu güncelledi.");
             showAlert(Alert.AlertType.INFORMATION, "Başarılı", "Oyun başarıyla güncellendi.");
         }
     }

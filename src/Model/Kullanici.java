@@ -1,40 +1,22 @@
 package Model;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-
 
 public class Kullanici {
 
-    private final SimpleIntegerProperty id;
-    private final SimpleStringProperty kullaniciAdi;
+    private int id;
+    private String kullaniciAdi;
+    private String kayitTarihi;
 
-    public Kullanici(int id, String kullaniciAdi) {
-        this.id = new SimpleIntegerProperty(id);
-        this.kullaniciAdi = new SimpleStringProperty(kullaniciAdi);
+    public Kullanici(int id, String kullaniciAdi, String kayitTarihi) {
+        this.id = id;
+        this.kullaniciAdi = kullaniciAdi;
+        this.kayitTarihi = kayitTarihi;
     }
 
-    public int getId() {
-        return id.get();
-    }
-
-    public SimpleIntegerProperty idProperty() {
-        return id;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public String getKullaniciAdi() { return kullaniciAdi; }
+    public void setKullaniciAdi(String kullaniciAdi) { this.kullaniciAdi = kullaniciAdi; }
     
-    public void setId(int id) {
-        this.id.set(id);
-    }
-
-
-    public String getKullaniciAdi() {
-        return kullaniciAdi.get();
-    }
-
-    public SimpleStringProperty kullaniciAdiProperty() {
-        return kullaniciAdi;
-    }
-
-    public void setKullaniciAdi(String kullaniciAdi) {
-        this.kullaniciAdi.set(kullaniciAdi);
-    }
+    public String getKayitTarihi() { return kayitTarihi; }
+    public void setKayitTarihi(String kayitTarihi) { this.kayitTarihi = kayitTarihi; }
 }
