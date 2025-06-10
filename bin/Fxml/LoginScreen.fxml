@@ -4,11 +4,11 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
 <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="400.0" spacing="15.0" style="-fx-background-color: #f4f4f4;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AppController">
@@ -42,18 +42,22 @@
       </VBox>
       <VBox alignment="CENTER" spacing="10.0">
          <children>
-            <!-- YENİ EKLENEN HATA ETİKETİ -->
             <Label fx:id="errorLabel" managed="false" text="Hata Mesajı" textFill="RED" visible="false">
                <font>
                   <Font name="System Bold" size="13.0" />
                </font>
             </Label>
-            <Button fx:id="loginButton" defaultButton="true" mnemonicParsing="false" onAction="#handleLoginButtonAction" prefHeight="45.0" prefWidth="200.0" style="-fx-background-color: #007bff; -fx-text-fill: white;" text="Giriş Yap">
-               <font>
-                  <Font name="System Bold" size="14.0" />
-               </font>
-            </Button>
-            <Button mnemonicParsing="false" onAction="#handleRegisterButtonAction" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="Hesabın yok mu? Kayıt Ol" underline="true" />
+            <HBox alignment="CENTER" spacing="10.0">
+               <children>
+                  <Button fx:id="loginButton" defaultButton="true" mnemonicParsing="false" onAction="#handleLoginButtonAction" prefHeight="45.0" prefWidth="200.0" style="-fx-background-color: #007bff; -fx-text-fill: white;" text="Giriş Yap">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Button>
+                  <ProgressIndicator fx:id="loadingIndicator" managed="false" prefHeight="35.0" prefWidth="35.0" visible="false" />
+               </children>
+            </HBox>
+            <Button fx:id="registerButton" mnemonicParsing="false" onAction="#handleRegisterButtonAction" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="Hesabın yok mu? Kayıt Ol" underline="true" />
          </children>
          <VBox.margin>
             <Insets top="10.0" />
