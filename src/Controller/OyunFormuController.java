@@ -1,6 +1,7 @@
 package Controller;
 
 import Model.Oyun;
+import Util.LogYoneticisi;
 import Util.UserSession;
 import Util.VeritabaniBaglantisi;
 import java.net.URL;
@@ -12,7 +13,12 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class OyunFormuController implements Initializable {
@@ -86,6 +92,7 @@ public class OyunFormuController implements Initializable {
         try (Connection conn = VeritabaniBaglantisi.baglan(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             prepareStatament(pstmt, false);
             pstmt.executeUpdate();
+            LogYoneticisi.logla(UserSession.getInstance().getUserId(), "'" + titleField.getText() + "' adlı yeni bir oyun ekledi.");
             showAlert(Alert.AlertType.INFORMATION, "Başarılı", "Oyun başarıyla eklendi.");
         }
     }
@@ -95,6 +102,7 @@ public class OyunFormuController implements Initializable {
         try (Connection conn = VeritabaniBaglantisi.baglan(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             prepareStatament(pstmt, true);
             pstmt.executeUpdate();
+            LogYoneticisi.logla(UserSession.getInstance().getUserId(), "'" + titleField.getText() + "' adlı oyunu güncelledi.");
             showAlert(Alert.AlertType.INFORMATION, "Başarılı", "Oyun başarıyla güncellendi.");
         }
     }
