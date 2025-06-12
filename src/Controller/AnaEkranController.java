@@ -60,6 +60,9 @@ public class AnaEkranController implements Initializable {
         turColumn.setCellValueFactory(new PropertyValueFactory<>("genre"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         
+        // DÜZELTME: Eksik olan CellValueFactory eklendi.
+        puanColumn.setCellValueFactory(new PropertyValueFactory<>("rating"));
+        
         setupRatingCellFactory();
         setupContextMenu();
 
@@ -79,6 +82,7 @@ public class AnaEkranController implements Initializable {
                 super.updateItem(rating, empty);
                 if (empty || rating == null || rating == 0) {
                     setText(null);
+                    setGraphic(null);
                 } else {
                     setText("★".repeat(rating) + "☆".repeat(10 - rating));
                     setStyle("-fx-font-family: 'Apple Color Emoji'; -fx-text-fill: #f5c518; -fx-alignment: CENTER;");
