@@ -18,6 +18,7 @@ public class Oyun {
     private int rating;
     private String tags;
     private String ekleyenKullanici; 
+    private String status;
 
     public Oyun() {}
 
@@ -73,4 +74,6 @@ public class Oyun {
     public void setEkleyenKullanici(String ekleyenKullanici) {
         this.ekleyenKullanici = ekleyenKullanici;
     }
+    public String getStatus() { return status; }
+public void setStatus(String status) { this.status = status; }
 }

@@ -1,7 +1,6 @@
 package Controller;
 
 import Model.Oyun;
-import Util.LogYoneticisi;
 import Util.UserSession;
 import Util.VeritabaniBaglantisi;
 import com.google.gson.Gson;
@@ -18,7 +17,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
@@ -31,12 +32,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -44,9 +42,14 @@ import javafx.stage.Stage;
 public class AnaEkranController implements Initializable {
 
     @FXML private TableView<Oyun> oyunlarTableView;
-    @FXML private TableColumn<Oyun, String> baslikColumn, platformColumn, turColumn, gelistiriciColumn, oynamaSuresiColumn;
-    @FXML private TableColumn<Oyun, Integer> puanColumn, cikisYiliColumn;
+    @FXML private TableColumn<Oyun, String> baslikColumn, platformColumn, turColumn, statusColumn;
+    @FXML private TableColumn<Oyun, Integer> puanColumn;
     @FXML private TextField aramaKutusu;
+
+    @FXML private VBox detayPaneli;
+    @FXML private Label titleLabel, genreLabel, developerLabel, publisherLabel, platformsLabel, translatorsLabel, steamidLabel, releaseYearLabel, playtimeLabel, formatLabel, languageLabel, ratingLabel, tagsLabel;
+    
+    @FXML private Label toplamOyunLabel, ortalamaPuanLabel, enCokOynananTurLabel;
 
     private ObservableList<Oyun> oyunListesi = FXCollections.observableArrayList();
 
@@ -55,21 +58,111 @@ public class AnaEkranController implements Initializable {
         baslikColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         platformColumn.setCellValueFactory(new PropertyValueFactory<>("platforms"));
         turColumn.setCellValueFactory(new PropertyValueFactory<>("genre"));
-        gelistiriciColumn.setCellValueFactory(new PropertyValueFactory<>("developer"));
-        puanColumn.setCellValueFactory(new PropertyValueFactory<>("rating"));
-        oynamaSuresiColumn.setCellValueFactory(new PropertyValueFactory<>("playtime"));
-        cikisYiliColumn.setCellValueFactory(new PropertyValueFactory<>("releaseYear"));
+        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        
+        setupRatingCellFactory();
+        setupContextMenu();
+
+        oyunlarTableView.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldValue, newValue) -> showGameDetails(newValue)
+        );
+
         oyunlariYukle();
         filtreyiAyarla();
+        showGameDetails(null);
+    }
+    
+    private void setupRatingCellFactory() {
+        puanColumn.setCellFactory(column -> new TableCell<Oyun, Integer>() {
+            @Override
+            protected void updateItem(Integer rating, boolean empty) {
+                super.updateItem(rating, empty);
+                if (empty || rating == null || rating == 0) {
+                    setText(null);
+                } else {
+                    setText("★".repeat(rating) + "☆".repeat(10 - rating));
+                    setStyle("-fx-font-family: 'Apple Color Emoji'; -fx-text-fill: #f5c518; -fx-alignment: CENTER;");
+                }
+            }
+        });
     }
 
-    @FXML
-    void handleOyunEkle(ActionEvent event) {
+    private void setupContextMenu() {
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem duzenleItem = new MenuItem("Düzenle");
+        MenuItem silItem = new MenuItem("Sil");
+
+        duzenleItem.setOnAction(this::handleOyunDuzenle);
+        silItem.setOnAction(this::handleOyunSil);
+
+        contextMenu.getItems().addAll(duzenleItem, silItem);
+
+        oyunlarTableView.setRowFactory(tv -> {
+            TableRow<Oyun> row = new TableRow<>();
+            row.setOnContextMenuRequested(event -> {
+                if (!row.isEmpty()) {
+                    contextMenu.show(row, event.getScreenX(), event.getScreenY());
+                }
+            });
+            return row;
+        });
+    }
+    
+    private void updateStatistics() {
+        int toplamOyun = oyunListesi.size();
+        double toplamPuan = 0;
+        int puanliOyunSayisi = 0;
+        Map<String, Integer> genreCounts = new HashMap<>();
+        
+        for (Oyun oyun : oyunListesi) {
+            if (oyun.getRating() > 0) {
+                toplamPuan += oyun.getRating();
+                puanliOyunSayisi++;
+            }
+            if (oyun.getGenre() != null && !oyun.getGenre().isEmpty()) {
+                genreCounts.put(oyun.getGenre(), genreCounts.getOrDefault(oyun.getGenre(), 0) + 1);
+            }
+        }
+        
+        double ortalamaPuan = (puanliOyunSayisi == 0) ? 0 : toplamPuan / puanliOyunSayisi;
+        String favoriTur = genreCounts.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("N/A");
+        
+        toplamOyunLabel.setText("Toplam Oyun: " + toplamOyun);
+        ortalamaPuanLabel.setText(String.format("Ortalama Puan: %.1f", ortalamaPuan));
+        enCokOynananTurLabel.setText("Favori Tür: " + favoriTur); 
+    }
+
+    private void showGameDetails(Oyun oyun) {
+        if (oyun != null) {
+            detayPaneli.setVisible(true);
+            detayPaneli.setManaged(true);
+            titleLabel.setText(oyun.getTitle());
+            genreLabel.setText(oyun.getGenre());
+            developerLabel.setText(oyun.getDeveloper());
+            publisherLabel.setText(oyun.getPublisher());
+            platformsLabel.setText(oyun.getPlatforms());
+            translatorsLabel.setText(oyun.getTranslators());
+            steamidLabel.setText(oyun.getSteamid());
+            releaseYearLabel.setText(oyun.getReleaseYear() == 0 ? "-" : String.valueOf(oyun.getReleaseYear()));
+            playtimeLabel.setText(oyun.getPlaytime());
+            formatLabel.setText(oyun.getFormat());
+            languageLabel.setText(oyun.getLanguage());
+            ratingLabel.setText(oyun.getRating() == 0 ? "-" : String.valueOf(oyun.getRating()));
+            tagsLabel.setText(oyun.getTags());
+        } else {
+            detayPaneli.setVisible(false);
+            detayPaneli.setManaged(false);
+        }
+    }
+    
+    @FXML void handleOyunEkle(ActionEvent event) {
         openOyunForm(null);
     }
 
-    @FXML
-    void handleOyunDuzenle(ActionEvent event) {
+    @FXML void handleOyunDuzenle(ActionEvent event) {
         Oyun seciliOyun = oyunlarTableView.getSelectionModel().getSelectedItem();
         if (seciliOyun == null) {
             showAlert(Alert.AlertType.WARNING, "Uyarı", "Lütfen düzenlemek için bir oyun seçin.");
@@ -77,31 +170,8 @@ public class AnaEkranController implements Initializable {
         }
         openOyunForm(seciliOyun);
     }
-    
-    private void openOyunForm(Oyun oyun) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/OyunFormu.fxml"));
-            Parent root = loader.load();
 
-            OyunFormuController controller = loader.getController();
-            controller.setOnFormClosed(this::oyunlariYukle);
-            if (oyun != null) {
-                controller.setDuzenlenecekOyun(oyun);
-            }
-
-            Stage stage = new Stage();
-            stage.setTitle(oyun == null ? "Yeni Oyun Ekle" : "Oyunu Düzenle");
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.showAndWait();
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Arayüz Hatası", "Oyun formu yüklenemedi.");
-        }
-    }
-
-    @FXML
-    void handleOyunSil(ActionEvent event) {
+    @FXML void handleOyunSil(ActionEvent event) {
         Oyun seciliOyun = oyunlarTableView.getSelectionModel().getSelectedItem();
         if (seciliOyun == null) {
             showAlert(Alert.AlertType.WARNING, "Uyarı", "Lütfen silmek için bir oyun seçin.");
@@ -114,14 +184,37 @@ public class AnaEkranController implements Initializable {
                 pstmt.setInt(1, seciliOyun.getId());
                 pstmt.setInt(2, UserSession.getInstance().getUserId());
                 if (pstmt.executeUpdate() > 0) {
-                    LogYoneticisi.logla(UserSession.getInstance().getUserId(), "'" + seciliOyun.getTitle() + "' adlı oyunu sildi.");
                     oyunListesi.remove(seciliOyun);
+                    updateStatistics();
                     showAlert(Alert.AlertType.INFORMATION, "Başarılı", "Oyun başarıyla silindi.");
                 }
             } catch (SQLException e) {
                 showAlert(Alert.AlertType.ERROR, "Veritabanı Hatası", "Oyun silinirken bir hata oluştu.");
                 e.printStackTrace();
             }
+        }
+    }
+    
+    private void openOyunForm(Oyun oyun) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/OyunFormu.fxml"));
+            Parent root = loader.load();
+            OyunFormuController controller = loader.getController();
+            controller.setOnFormClosed(() -> {
+                oyunlariYukle();
+                updateStatistics();
+            });
+            if (oyun != null) {
+                controller.setDuzenlenecekOyun(oyun);
+            }
+            Stage stage = new Stage();
+            stage.setTitle(oyun == null ? "Yeni Oyun Ekle" : "Oyunu Düzenle");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Arayüz Hatası", "Oyun formu yüklenemedi.");
         }
     }
 
@@ -134,6 +227,7 @@ public class AnaEkranController implements Initializable {
             while (rs.next()) {
                 oyunListesi.add(oyunFromResultSet(rs));
             }
+            updateStatistics();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -156,6 +250,7 @@ public class AnaEkranController implements Initializable {
         oyun.setLanguage(rs.getString("language"));
         oyun.setRating(rs.getInt("rating"));
         oyun.setTags(rs.getString("tags"));
+        oyun.setStatus(rs.getString("status"));
         return oyun;
     }
     
@@ -164,13 +259,11 @@ public class AnaEkranController implements Initializable {
         fileChooser.setTitle("JSON Dosyasını İçe Aktar");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Dosyaları", "*.json"));
         File file = fileChooser.showOpenDialog(oyunlarTableView.getScene().getWindow());
-
         if (file != null) {
             try (FileReader reader = new FileReader(file)) {
                 Gson gson = new Gson();
                 Type oyunListesiTipi = new TypeToken<List<Oyun>>(){}.getType();
                 List<Oyun> iceAktarilanOyunlar = gson.fromJson(reader, oyunListesiTipi);
-
                 if (iceAktarilanOyunlar != null) {
                     iceAktarilanOyunlar.forEach(this::oyunuVeritabaninaKaydet);
                     oyunlariYukle();
@@ -189,7 +282,6 @@ public class AnaEkranController implements Initializable {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Dosyaları", "*.json"));
         fileChooser.setInitialFileName("oyun_katalogum.json");
         File file = fileChooser.showSaveDialog(oyunlarTableView.getScene().getWindow());
-
         if (file != null) {
             try (Writer writer = new FileWriter(file)) {
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -203,7 +295,7 @@ public class AnaEkranController implements Initializable {
     }
 
     private void oyunuVeritabaninaKaydet(Oyun oyun) {
-        String sql = "INSERT INTO oyunlar (kullanici_id, title, genre, developer, publisher, platforms, translators, steamid, release_year, playtime, format, language, rating, tags) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO oyunlar (kullanici_id, title, genre, developer, publisher, platforms, translators, steamid, release_year, playtime, format, language, rating, tags, status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection conn = VeritabaniBaglantisi.baglan(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, UserSession.getInstance().getUserId());
             pstmt.setString(2, oyun.getTitle());
@@ -219,6 +311,7 @@ public class AnaEkranController implements Initializable {
             pstmt.setString(12, oyun.getLanguage());
             pstmt.setInt(13, oyun.getRating());
             pstmt.setString(14, oyun.getTags());
+            pstmt.setString(15, oyun.getStatus() == null ? "Kütüphanede" : oyun.getStatus());
             pstmt.executeUpdate();
         } catch (SQLException e){
             e.printStackTrace();

@@ -6,29 +6,34 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AnaEkranController">
+<BorderPane prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AnaEkranController">
    <top>
-      <VBox prefWidth="100.0" BorderPane.alignment="CENTER">
+      <VBox>
          <children>
             <MenuBar>
               <menus>
                 <Menu mnemonicParsing="false" text="Dosya">
                   <items>
                     <MenuItem mnemonicParsing="false" onAction="#handleImportJson" text="JSON İçe Aktar" />
-                        <MenuItem mnemonicParsing="false" onAction="#handleExportJson" text="JSON Dışa Aktar" />
+                    <MenuItem mnemonicParsing="false" onAction="#handleExportJson" text="JSON Dışa Aktar" />
                   </items>
                 </Menu>
               </menus>
             </MenuBar>
-            <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
+            <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
                <children>
                   <Label text="Oyun Kataloğum">
                      <font>
@@ -40,37 +45,95 @@
                   <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
                </padding>
             </HBox>
-            <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="200.0" spacing="10.0">
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
                <children>
                   <TextField fx:id="aramaKutusu" prefHeight="30.0" prefWidth="350.0" promptText="Oyun adı, tür, platform veya etikete göre ara..." />
-                  <Button fx:id="oyunEkleButton" mnemonicParsing="false" onAction="#handleOyunEkle" prefHeight="30.0" style="-fx-background-color: #28a745; -fx-text-fill: white;" text="Yeni Oyun Ekle" />
-                  <Button fx:id="oyunDuzenleButton" mnemonicParsing="false" onAction="#handleOyunDuzenle" prefHeight="30.0" text="Seçili Oyunu Düzenle" />
-                  <Button fx:id="oyunSilButton" mnemonicParsing="false" onAction="#handleOyunSil" prefHeight="30.0" style="-fx-background-color: #dc3545; -fx-text-fill: white;" text="Seçili Oyunu Sil" />
+                  <Button onAction="#handleOyunEkle" prefHeight="30.0" style="-fx-background-color: #28a745; -fx-text-fill: white;" text="Yeni Oyun Ekle" />
+                  <Button onAction="#handleOyunDuzenle" prefHeight="30.0" text="Seçili Oyunu Düzenle" />
+                  <Button onAction="#handleOyunSil" prefHeight="30.0" style="-fx-background-color: #dc3545; -fx-text-fill: white;" text="Seçili Oyunu Sil" />
                </children>
                <padding>
-                  <Insets bottom="10.0" left="20.0" right="20.0" />
+                  <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
                </padding>
             </HBox>
          </children>
       </VBox>
    </top>
    <center>
-      <TableView fx:id="oyunlarTableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-        <columns>
-          <TableColumn fx:id="baslikColumn" prefWidth="250.0" text="Başlık" />
-          <TableColumn fx:id="platformColumn" prefWidth="150.0" text="Platformlar" />
-            <TableColumn fx:id="turColumn" prefWidth="120.0" text="Tür" />
-            <TableColumn fx:id="gelistiriciColumn" prefWidth="150.0" text="Geliştirici" />
-            <TableColumn fx:id="puanColumn" minWidth="0.0" prefWidth="70.0" text="Puan" />
-            <TableColumn fx:id="oynamaSuresiColumn" prefWidth="120.0" text="Oynama Süresi" />
-            <TableColumn fx:id="cikisYiliColumn" prefWidth="80.0" text="Çıkış Yılı" />
-        </columns>
-         <BorderPane.margin>
-            <Insets bottom="20.0" left="20.0" right="20.0" />
-         </BorderPane.margin>
-         <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-         </columnResizePolicy>
-      </TableView>
+      <SplitPane dividerPositions="0.75" prefHeight="160.0" prefWidth="200.0">
+        <items>
+            <TableView fx:id="oyunlarTableView">
+              <columns>
+                <TableColumn fx:id="baslikColumn" prefWidth="250.0" text="Başlık" />
+                <TableColumn fx:id="platformColumn" prefWidth="150.0" text="Platformlar" />
+                <TableColumn fx:id="turColumn" prefWidth="120.0" text="Tür" />
+                <TableColumn fx:id="statusColumn" prefWidth="120.0" text="Durum" />
+                <TableColumn fx:id="puanColumn" prefWidth="120.0" text="Puan" />
+              </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+               <content>
+                  <VBox fx:id="detayPaneli" spacing="10.0" style="-fx-background-color: #fafafa;" visible="false">
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                     <children>
+                        <Label text="Oyun Detayları">
+                           <font>
+                              <Font name="System Bold" size="18.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <GridPane hgap="8.0" vgap="8.0">
+                           <children>
+                              <Label text="Başlık:" textFill="#555555" GridPane.halignment="RIGHT" />
+                              <Label fx:id="titleLabel" text="-" wrapText="true" GridPane.columnIndex="1" />
+                              <Label text="Tür:" textFill="#555555" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                              <Label fx:id="genreLabel" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label text="Geliştirici:" textFill="#555555" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+                              <Label fx:id="developerLabel" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Label text="Yayıncı:" textFill="#555555" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+                              <Label fx:id="publisherLabel" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <Label text="Platformlar:" textFill="#555555" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+                              <Label fx:id="platformsLabel" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <Label text="Çevirmenler:" textFill="#555555" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                              <Label fx:id="translatorsLabel" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <Label text="Steam ID:" textFill="#555555" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
+                              <Label fx:id="steamidLabel" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                              <Label text="Çıkış Yılı:" textFill="#555555" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
+                              <Label fx:id="releaseYearLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                              <Label text="Oynama Süresi:" textFill="#555555" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />
+                              <Label fx:id="playtimeLabel" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                              <Label text="Format:" textFill="#555555" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
+                              <Label fx:id="formatLabel" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                              <Label text="Dil:" textFill="#555555" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
+                              <Label fx:id="languageLabel" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+                              <Label text="Puan:" textFill="#555555" GridPane.halignment="RIGHT" GridPane.rowIndex="11" />
+                              <Label fx:id="ratingLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                              <Label text="Etiketler:" textFill="#555555" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
+                              <Label fx:id="tagsLabel" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+                           </children>
+                        </GridPane>
+                     </children>
+                  </VBox>
+               </content>
+            </ScrollPane>
+        </items>
+      </SplitPane>
    </center>
+   <bottom>
+      <HBox alignment="CENTER_LEFT" spacing="30.0" style="-fx-background-color: #e9ecef; -fx-padding: 10; -fx-border-color: #d6d8db; -fx-border-width: 1 0 0 0;">
+         <children>
+            <Label text="İstatistikler:" style="-fx-font-weight: bold;" />
+            <Label fx:id="toplamOyunLabel" text="Toplam Oyun: 0" />
+            <Label fx:id="ortalamaPuanLabel" text="Ortalama Puan: 0.0" />
+            <Label fx:id="enCokOynananTurLabel" text="Favori Tür: N/A" />
+         </children>
+      </HBox>
+   </bottom>
 </BorderPane>

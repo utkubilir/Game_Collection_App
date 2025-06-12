@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
@@ -14,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="650.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.OyunFormuController">
+<AnchorPane prefHeight="700.0" prefWidth="550.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.OyunFormuController">
    <children>
       <VBox alignment="TOP_CENTER" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <padding>
@@ -58,8 +59,10 @@
                         <TextField fx:id="languageField" promptText="Türkçe Altyazı, İngilizce, ..." GridPane.columnIndex="1" GridPane.rowIndex="10" />
                         <Label text="Puan (1-10)" GridPane.halignment="RIGHT" GridPane.rowIndex="11" />
                         <TextField fx:id="ratingField" GridPane.columnIndex="1" GridPane.rowIndex="11" />
-                        <Label text="Etiketler" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
-                        <TextArea fx:id="tagsArea" prefHeight="60.0" promptText="Virgülle ayırın (RPG, Açık Dünya, ...)" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+                        <Label text="Durum" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
+                        <ComboBox fx:id="statusComboBox" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+                        <Label text="Etiketler" GridPane.halignment="RIGHT" GridPane.rowIndex="13" />
+                        <TextArea fx:id="tagsArea" prefHeight="60.0" promptText="Virgülle ayırın (RPG, Açık Dünya, ...)" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="13" />
                      </children>
                   </GridPane>
                </content>
