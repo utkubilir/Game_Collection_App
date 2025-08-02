@@ -24,6 +24,20 @@ JSON Processing: Google Gson
 Design Pattern: MVC (Model-View-Controller)
 
 
+## Environment Variables
+
+The application requires the following environment variables to establish a database connection:
+
+| Variable | Description |
+|----------|-------------|
+| `DB_HOST` | Database host name |
+| `DB_PORT` | Database port |
+| `DB_NAME` | Database name |
+| `DB_USER` | Username used for authentication |
+| `DB_PASSWORD` | Password used for authentication |
+
+Ensure these variables are set in your environment before launching the application.
+
 Project Status
 This project is a living work and is under active development. Planned features for the future include:
 Integration with external APIs (e.g., Steam, RAWG.io) for game cover art.
