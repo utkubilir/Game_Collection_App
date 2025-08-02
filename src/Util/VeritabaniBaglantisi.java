@@ -6,18 +6,33 @@ import java.sql.SQLException;
 
 public class VeritabaniBaglantisi {
 
-    private static final String HOST = "sql7.freesqldatabase.com";
-    private static final String PORT = "3306";
-    private static final String DB_NAME = "sql7783460";
-    private static final String KULLANICI_ADI = "sql7783460";
-    private static final String SIFRE = "nRwAu5WH44";
+    private static String getEnvOrThrow(String key) {
+        String value = System.getenv(key);
+        if (value == null || value.isEmpty()) {
+            throw new IllegalStateException("Missing required environment variable: " + key);
+        }
+        return value;
+    }
 
-    private static final String URL = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME + "?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=CONVERT_TO_NULL";
+    private static String buildUrl() {
+        String host = getEnvOrThrow("DB_HOST");
+        String port = getEnvOrThrow("DB_PORT");
+        String dbName = getEnvOrThrow("DB_NAME");
+        return "jdbc:mysql://" + host + ":" + port + "/" + dbName +
+                "?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=CONVERT_TO_NULL";
+    }
 
     public static Connection baglan() {
         try {
+            String url = buildUrl();
+            String kullaniciAdi = getEnvOrThrow("DB_USER");
+            String sifre = getEnvOrThrow("DB_PASSWORD");
+
             Class.forName("com.mysql.cj.jdbc.Driver");
-            return DriverManager.getConnection(URL, KULLANICI_ADI, SIFRE);
+            return DriverManager.getConnection(url, kullaniciAdi, sifre);
+        } catch (IllegalStateException e) {
+            System.err.println("Veritabanı yapılandırma hatası: " + e.getMessage());
+            return null;
         } catch (ClassNotFoundException | SQLException e) {
             System.err.println("Veritabanına bağlanılamadı! Hata: " + e.getMessage());
             e.printStackTrace();
