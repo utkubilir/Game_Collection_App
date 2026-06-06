@@ -1,0 +1,11 @@
+# Copy this file to "config.properties" and fill in your own values.
+# config.properties is git-ignored and must never be committed.
+#
+# Alternatively, set these as environment variables (they take precedence):
+#   DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
+
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=game_collection
+DB_USER=your_username
+DB_PASSWORD=your_password

@@ -1,0 +1,19 @@
+# Build output
+target/
+bin/
+*.class
+
+# Local configuration with secrets — never commit
+config.properties
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
