@@ -1,13 +1,11 @@
 package Controller;
 
+import Dao.OyunDao;
+import Dao.VeriErisimHatasi;
 import Model.Kullanici;
 import Model.Oyun;
-import Util.VeritabaniBaglantisi;
+import Util.Mesaj;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,7 +31,8 @@ public class TumOyunlarController implements Initializable {
     @FXML private TextField aramaKutusu;
     @FXML private Label baslikLabel;
 
-    private ObservableList<Oyun> tumOyunlarListesi = FXCollections.observableArrayList();
+    private final OyunDao oyunDao = new OyunDao();
+    private final ObservableList<Oyun> tumOyunlarListesi = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -43,7 +42,9 @@ public class TumOyunlarController implements Initializable {
         turColumn.setCellValueFactory(new PropertyValueFactory<>("genre"));
         gelistiriciColumn.setCellValueFactory(new PropertyValueFactory<>("developer"));
         puanColumn.setCellValueFactory(new PropertyValueFactory<>("rating"));
-        
+
+        oyunlarTableView.setPlaceholder(new Label("Görüntülenecek oyun bulunmuyor."));
+
         // Varsayılan olarak tüm oyunları yükle
         oyunlariYukle(null);
         filtreyiAyarla();
@@ -59,32 +60,12 @@ public class TumOyunlarController implements Initializable {
     }
 
     private void oyunlariYukle(Kullanici kullanici) {
-        tumOyunlarListesi.clear();
-        
-        String baseSql = "SELECT o.*, u.kullanici_adi as ekleyen_kullanici FROM oyunlar o JOIN kullanicilar u ON o.kullanici_id = u.id";
-        String sql = (kullanici == null) ? baseSql : baseSql + " WHERE u.id = ?";
-        
-        try (Connection conn = VeritabaniBaglantisi.baglan();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            if (kullanici != null) {
-                pstmt.setInt(1, kullanici.getId());
-            }
-            
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                Oyun oyun = new Oyun();
-                oyun.setId(rs.getInt("id"));
-                oyun.setTitle(rs.getString("title"));
-                oyun.setPlatforms(rs.getString("platforms"));
-                oyun.setGenre(rs.getString("genre"));
-                oyun.setDeveloper(rs.getString("developer"));
-                oyun.setRating(rs.getInt("rating"));
-                oyun.setEkleyenKullanici(rs.getString("ekleyen_kullanici"));
-                tumOyunlarListesi.add(oyun);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Integer kullaniciId = (kullanici == null) ? null : kullanici.getId();
+        try {
+            tumOyunlarListesi.setAll(oyunDao.tumOyunlar(kullaniciId));
+        } catch (VeriErisimHatasi e) {
+            tumOyunlarListesi.clear();
+            Mesaj.hata("Veritabanı Hatası", "Oyunlar yüklenemedi.");
         }
     }
 
@@ -94,8 +75,8 @@ public class TumOyunlarController implements Initializable {
             filtrelenmisData.setPredicate(oyun -> {
                 if (newValue == null || newValue.isEmpty()) return true;
                 String lowerCaseFilter = newValue.toLowerCase();
-                if (oyun.getTitle().toLowerCase().contains(lowerCaseFilter)) return true;
-                if (oyun.getEkleyenKullanici().toLowerCase().contains(lowerCaseFilter)) return true;
+                if (oyun.getTitle() != null && oyun.getTitle().toLowerCase().contains(lowerCaseFilter)) return true;
+                if (oyun.getEkleyenKullanici() != null && oyun.getEkleyenKullanici().toLowerCase().contains(lowerCaseFilter)) return true;
                 return false;
             });
         });

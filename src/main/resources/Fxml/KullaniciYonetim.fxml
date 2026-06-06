@@ -38,10 +38,11 @@
    <center>
       <TableView fx:id="kullaniciTableView" BorderPane.alignment="CENTER">
         <columns>
-          <TableColumn fx:id="idSutun" prefWidth="75.0" text="ID" />
-          <TableColumn fx:id="kullaniciAdiSutun" prefWidth="300.0" text="Kullanıcı Adı" />
-          <TableColumn fx:id="kayitTarihiColumn" prefWidth="250.0" text="Kayıt Tarihi" />
-          <TableColumn fx:id="islemlerSutun" prefWidth="250.0" text="İşlemler" />
+          <TableColumn fx:id="idSutun" prefWidth="60.0" text="ID" />
+          <TableColumn fx:id="kullaniciAdiSutun" prefWidth="240.0" text="Kullanıcı Adı" />
+          <TableColumn fx:id="rolSutun" prefWidth="100.0" text="Rol" />
+          <TableColumn fx:id="kayitTarihiColumn" prefWidth="200.0" text="Kayıt Tarihi" />
+          <TableColumn fx:id="islemlerSutun" prefWidth="340.0" text="İşlemler" />
         </columns>
          <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

@@ -1,5 +1,10 @@
 package Controller;
 
+import Util.LogYoneticisi;
+import Util.Mesaj;
+import Util.Navigasyon;
+import Util.Pencere;
+import Util.UserSession;
 import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -7,7 +12,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -28,8 +32,10 @@ public class AdminPanelController {
 
     @FXML
     void cikisYapButonAction(ActionEvent event) {
-        Stage stage = (Stage) anaIcerikPane.getScene().getWindow();
-        stage.close();
+        LogYoneticisi.logla(UserSession.getInstance().getUserId(), "Sistemden çıkış yaptı.");
+        UserSession.cleanUserSession();
+        Navigasyon.girisEkraniniAc();
+        ((Stage) anaIcerikPane.getScene().getWindow()).close();
     }
 
   
@@ -55,20 +61,15 @@ public class AdminPanelController {
             Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle(title);
-            stage.setScene(new Scene(root));
+            Pencere.ikonla(stage);
+            Scene scene = new Scene(root);
+            Util.Tema.uygula(scene);
+            stage.setScene(scene);
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
         } catch (IOException e) {
-             showAlert(Alert.AlertType.ERROR, "Arayüz Hatası", "Ekran yüklenemedi: " + fxmlPath);
+             Mesaj.hata("Arayüz Hatası", "Ekran yüklenemedi: " + fxmlPath);
              e.printStackTrace();
         }
-    }
-
-    private void showAlert(Alert.AlertType alertType, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }

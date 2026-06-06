@@ -43,8 +43,12 @@ CREATE TABLE IF NOT EXISTS oyunlar (
     rating       INT,
     tags         TEXT,
     status       VARCHAR(50)  NOT NULL DEFAULT 'Kütüphanede',
+    created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_oyunlar_kullanici (kullanici_id),
+    -- A user cannot have two games with the same title (also enables import upsert/dedup).
+    UNIQUE KEY uq_oyun_kullanici_title (kullanici_id, title),
     CONSTRAINT fk_oyunlar_kullanici
         FOREIGN KEY (kullanici_id) REFERENCES kullanicilar (id)
         ON DELETE CASCADE
@@ -72,3 +76,13 @@ CREATE TABLE IF NOT EXISTS kullanici_loglari (
 -- ------------------------------------------------------------
 -- INSERT INTO kullanicilar (kullanici_adi, sifre, is_admin)
 -- VALUES ('admin', 'admin123', TRUE);
+
+-- ------------------------------------------------------------
+-- Upgrade an EXISTING database that predates the columns above.
+-- Run these once if your `oyunlar` table was created before this version.
+-- (Safe to skip on a fresh install created from the CREATE TABLE statements.)
+-- ------------------------------------------------------------
+-- ALTER TABLE oyunlar
+--     ADD COLUMN created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     ADD COLUMN updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--     ADD UNIQUE KEY uq_oyun_kullanici_title (kullanici_id, title);

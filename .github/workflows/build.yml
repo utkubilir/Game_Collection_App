@@ -1,0 +1,29 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build, test and package
+        run: mvn -B verify
+
+      - name: Upload runnable jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: game-collection-app
+          path: target/game-collection-app.jar
+          if-no-files-found: error

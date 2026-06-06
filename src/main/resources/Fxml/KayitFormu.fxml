@@ -11,27 +11,27 @@
 
 <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="450.0" spacing="15.0" style="-fx-background-color: #f4f4f4;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.KayitController">
    <children>
-      <Label text="Yeni Kullanıcı Kaydı">
+      <Label text="%register.title">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
       <VBox prefWidth="100.0" spacing="5.0">
          <children>
-            <Label text="Kullanıcı Adı" />
-            <TextField fx:id="kullaniciAdiField" prefHeight="40.0" promptText="Bir kullanıcı adı belirleyin" />
+            <Label text="%register.username" />
+            <TextField fx:id="kullaniciAdiField" prefHeight="40.0" promptText="%register.username.prompt" />
          </children>
       </VBox>
       <VBox prefWidth="100.0" spacing="5.0">
          <children>
-            <Label text="Şifre" />
-            <PasswordField fx:id="sifreField" prefHeight="40.0" promptText="Şifrenizi girin" />
+            <Label text="%register.password" />
+            <PasswordField fx:id="sifreField" prefHeight="40.0" promptText="%register.password.prompt" />
          </children>
       </VBox>
       <VBox prefWidth="100.0" spacing="5.0">
          <children>
-            <Label text="Şifre Tekrar" />
-            <PasswordField fx:id="sifreTekrarField" prefHeight="40.0" promptText="Şifrenizi tekrar girin" />
+            <Label text="%register.password2" />
+            <PasswordField fx:id="sifreTekrarField" prefHeight="40.0" promptText="%register.password2.prompt" />
             <Label fx:id="validationStatusLabel" managed="false" visible="false" />
          </children>
       </VBox>
@@ -40,12 +40,12 @@
             <Insets top="10.0" />
          </VBox.margin>
          <children>
-            <Button fx:id="kayitOlButton" defaultButton="true" mnemonicParsing="false" onAction="#handleKayitOlButtonAction" prefHeight="45.0" prefWidth="200.0" style="-fx-background-color: #28a745; -fx-text-fill: white;" text="Kayıt Ol">
+            <Button fx:id="kayitOlButton" defaultButton="true" mnemonicParsing="false" onAction="#handleKayitOlButtonAction" prefHeight="45.0" prefWidth="200.0" style="-fx-background-color: #28a745; -fx-text-fill: white;" text="%register.submit">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
             </Button>
-            <Button mnemonicParsing="false" onAction="#handleGirisEkraninaDon" style="-fx-background-color: transparent;" text="Zaten bir hesabın var mı? Giriş Yap" underline="true" />
+            <Button mnemonicParsing="false" onAction="#handleGirisEkraninaDon" style="-fx-background-color: transparent;" text="%register.back" underline="true" />
          </children>
       </VBox>
    </children>

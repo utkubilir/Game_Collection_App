@@ -1,14 +1,14 @@
 package Controller;
 
+import Dao.KullaniciDao;
+import Dao.VeriErisimHatasi;
+import Model.Kullanici;
 import Util.LogYoneticisi;
+import Util.Mesaj;
 import Util.UserSession;
-import Util.VeritabaniBaglantisi;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -17,7 +17,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -42,11 +41,14 @@ public class AppController implements Initializable {
     private final String errorStyle = "-fx-border-color: #d9534f; -fx-border-width: 1.5; -fx-border-radius: 5;";
     private final String defaultStyle = "";
 
+    private final KullaniciDao kullaniciDao = new KullaniciDao();
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         usernameField.textProperty().addListener((obs, oldText, newText) -> clearErrorState());
         passwordField.textProperty().addListener((obs, oldText, newText) -> clearErrorState());
         visiblePasswordField.textProperty().addListener((obs, oldText, newText) -> clearErrorState());
+        javafx.application.Platform.runLater(() -> usernameField.requestFocus());
     }
 
     @FXML
@@ -88,31 +90,20 @@ public class AppController implements Initializable {
         new Thread(loginTask).start();
     }
 
-    private LoginResult performLoginValidation(String username, String password) throws SQLException {
+    private LoginResult performLoginValidation(String username, String password) {
         if (username.trim().isEmpty() || password.trim().isEmpty()) {
             return new LoginResult(false, false, "Kullanıcı adı ve şifre boş bırakılamaz.");
         }
-
-        String sql = "SELECT id, is_admin FROM kullanicilar WHERE kullanici_adi = ? AND sifre = ?";
-        try (Connection conn = VeritabaniBaglantisi.baglan();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            if (conn == null) { 
-                return new LoginResult(false, false, "Veritabanı bağlantısı kurulamadı.");
+        try {
+            Optional<Kullanici> kullanici = kullaniciDao.dogrula(username, password);
+            if (kullanici.isPresent()) {
+                UserSession.createInstance(kullanici.get().getId(), username);
+                LogYoneticisi.logla(kullanici.get().getId(), "Sisteme giriş yaptı.");
+                return new LoginResult(true, kullanici.get().isAdmin(), "Başarılı");
             }
-            pstmt.setString(1, username);
-            pstmt.setString(2, password);
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                int userId = rs.getInt("id");
-                boolean isAdmin = rs.getBoolean("is_admin");
-                UserSession.createInstance(userId, username);
-                LogYoneticisi.logla(userId, "Sisteme giriş yaptı.");
-                return new LoginResult(true, isAdmin, "Başarılı");
-            } else {
-                return new LoginResult(false, false, "Kullanıcı adı veya şifre yanlış!");
-            }
+            return new LoginResult(false, false, "Kullanıcı adı veya şifre yanlış!");
+        } catch (VeriErisimHatasi e) {
+            return new LoginResult(false, false, "Veritabanına bağlanılamadı. Lütfen daha sonra tekrar deneyin.");
         }
     }
     
@@ -177,11 +168,14 @@ public class AppController implements Initializable {
 
     private void openWindow(String fxmlPath, String title, boolean modal) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath), Util.I18n.bundle());
             Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle(title);
-            stage.setScene(new Scene(root));
+            Util.Pencere.ikonla(stage);
+            Scene scene = new Scene(root);
+            Util.Tema.uygula(scene);
+            stage.setScene(scene);
             if (modal) {
                 stage.initModality(Modality.APPLICATION_MODAL);
                 stage.showAndWait();
@@ -190,16 +184,8 @@ public class AppController implements Initializable {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Arayüz Hatası", "Ekran yüklenemedi: " + fxmlPath);
+            Mesaj.hata("Arayüz Hatası", "Ekran yüklenemedi: " + fxmlPath);
         }
-    }
-
-    private void showAlert(Alert.AlertType alertType, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }
 

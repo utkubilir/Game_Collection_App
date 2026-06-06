@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="560.0" prefWidth="900.0" spacing="15.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.IstatistikController">
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+   <children>
+      <Label text="İstatistikler">
+         <font>
+            <Font name="System Bold" size="22.0" />
+         </font>
+      </Label>
+      <HBox alignment="CENTER_LEFT" spacing="30.0" style="-fx-background-color: #e9ecef; -fx-padding: 10; -fx-background-radius: 6;">
+         <children>
+            <Label fx:id="toplamLabel" text="Toplam Oyun: 0" />
+            <Label fx:id="puanliLabel" text="Puanlanan: 0" />
+            <Label fx:id="ortalamaLabel" text="Ortalama Puan: 0.0" />
+            <Label fx:id="favoriLabel" text="Favori Tür: N/A" />
+         </children>
+      </HBox>
+      <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+         <children>
+            <PieChart fx:id="durumChart" title="Duruma Göre Dağılım" HBox.hgrow="ALWAYS" />
+            <BarChart fx:id="turChart" title="Türlere Göre Oyun Sayısı" HBox.hgrow="ALWAYS">
+               <xAxis>
+                  <CategoryAxis fx:id="turXAxis" label="Tür" />
+               </xAxis>
+               <yAxis>
+                  <NumberAxis fx:id="turYAxis" label="Adet" />
+               </yAxis>
+            </BarChart>
+         </children>
+      </HBox>
+   </children>
+</VBox>

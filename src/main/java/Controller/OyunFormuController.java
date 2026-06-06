@@ -1,19 +1,19 @@
 package Controller;
 
+import Dao.BenzersizlikHatasi;
+import Dao.OyunDao;
+import Dao.VeriErisimHatasi;
 import Model.Oyun;
+import Util.Dogrulama;
 import Util.LogYoneticisi;
+import Util.Mesaj;
 import Util.UserSession;
-import Util.VeritabaniBaglantisi;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -29,9 +29,10 @@ public class OyunFormuController implements Initializable {
     @FXML private ComboBox<String> statusComboBox;
     @FXML private Button kaydetButton;
 
+    private final OyunDao oyunDao = new OyunDao();
     private Oyun duzenlenecekOyun;
     private Runnable onFormClosedCallback;
-    
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         statusComboBox.setItems(FXCollections.observableArrayList(
@@ -42,7 +43,7 @@ public class OyunFormuController implements Initializable {
     public void setDuzenlenecekOyun(Oyun oyun) {
         this.duzenlenecekOyun = oyun;
         formBaslikLabel.setText("Oyunu Düzenle");
-        
+
         titleField.setText(oyun.getTitle());
         genreField.setText(oyun.getGenre());
         developerField.setText(oyun.getDeveloper());
@@ -66,91 +67,76 @@ public class OyunFormuController implements Initializable {
     @FXML
     void handleKaydet(ActionEvent event) {
         if (titleField.getText() == null || titleField.getText().trim().isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Hata", "Başlık alanı boş bırakılamaz.");
+            Mesaj.hata("Hata", "Başlık alanı boş bırakılamaz.");
             return;
         }
 
+        String puanHata = Dogrulama.puanHatasi(ratingField.getText());
+        if (puanHata != null) {
+            Mesaj.hata("Hata", puanHata);
+            return;
+        }
+
+        String yilHata = Dogrulama.yilHatasi(releaseYearField.getText());
+        if (yilHata != null) {
+            Mesaj.hata("Hata", yilHata);
+            return;
+        }
+
+        int userId = UserSession.getInstance().getUserId();
+        Oyun oyun = formdanOyun();
         try {
             if (duzenlenecekOyun == null) {
-                yeniOyunEkle();
+                oyunDao.ekle(oyun, userId);
+                LogYoneticisi.logla(userId, "'" + oyun.getTitle() + "' adlı yeni bir oyun ekledi.");
+                Mesaj.bilgi("Başarılı", "Oyun başarıyla eklendi.");
             } else {
-                oyunuGuncelle();
+                oyun.setId(duzenlenecekOyun.getId());
+                oyunDao.guncelle(oyun, userId);
+                LogYoneticisi.logla(userId, "'" + oyun.getTitle() + "' adlı oyunu güncelledi.");
+                Mesaj.bilgi("Başarılı", "Oyun başarıyla güncellendi.");
             }
-
             if (onFormClosedCallback != null) {
                 onFormClosedCallback.run();
             }
             closeWindow();
-        } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Hata", "Bir hata oluştu: " + e.getMessage());
-            e.printStackTrace();
+        } catch (BenzersizlikHatasi e) {
+            Mesaj.hata("Hata", e.getMessage());
+        } catch (VeriErisimHatasi e) {
+            Mesaj.hata("Veritabanı Hatası", "İşlem sırasında bir hata oluştu.");
         }
     }
 
-    private void yeniOyunEkle() throws SQLException {
-        String sql = "INSERT INTO oyunlar (kullanici_id, title, genre, developer, publisher, platforms, translators, steamid, release_year, playtime, format, language, rating, tags, status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        try (Connection conn = VeritabaniBaglantisi.baglan(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            prepareStatament(pstmt, false);
-            pstmt.executeUpdate();
-            LogYoneticisi.logla(UserSession.getInstance().getUserId(), "'" + titleField.getText() + "' adlı yeni bir oyun ekledi.");
-            showAlert(Alert.AlertType.INFORMATION, "Başarılı", "Oyun başarıyla eklendi.");
-        }
+    private Oyun formdanOyun() {
+        Oyun oyun = new Oyun();
+        oyun.setTitle(titleField.getText());
+        oyun.setGenre(genreField.getText());
+        oyun.setDeveloper(developerField.getText());
+        oyun.setPublisher(publisherField.getText());
+        oyun.setPlatforms(platformsField.getText());
+        oyun.setTranslators(translatorsArea.getText());
+        oyun.setSteamid(steamidField.getText());
+        oyun.setReleaseYear(tamSayi(releaseYearField.getText()));
+        oyun.setPlaytime(playtimeField.getText());
+        oyun.setFormat(formatField.getText());
+        oyun.setLanguage(languageField.getText());
+        oyun.setRating(tamSayi(ratingField.getText()));
+        oyun.setTags(tagsArea.getText());
+        oyun.setStatus(statusComboBox.getValue() == null ? "Kütüphanede" : statusComboBox.getValue());
+        return oyun;
     }
 
-    private void oyunuGuncelle() throws SQLException {
-        String sql = "UPDATE oyunlar SET title=?, genre=?, developer=?, publisher=?, platforms=?, translators=?, steamid=?, release_year=?, playtime=?, format=?, language=?, rating=?, tags=?, status=? WHERE id = ?";
-        try (Connection conn = VeritabaniBaglantisi.baglan(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            prepareStatament(pstmt, true);
-            pstmt.executeUpdate();
-            LogYoneticisi.logla(UserSession.getInstance().getUserId(), "'" + titleField.getText() + "' adlı oyunu güncelledi.");
-            showAlert(Alert.AlertType.INFORMATION, "Başarılı", "Oyun başarıyla güncellendi.");
-        }
-    }
-    
-    private void prepareStatament(PreparedStatement pstmt, boolean isUpdate) throws SQLException {
-        int year = releaseYearField.getText().trim().isEmpty() ? 0 : Integer.parseInt(releaseYearField.getText().trim());
-        int rating = ratingField.getText().trim().isEmpty() ? 0 : Integer.parseInt(ratingField.getText().trim());
-        String status = statusComboBox.getValue() == null ? "Kütüphanede" : statusComboBox.getValue();
-        int paramIndex = 1;
-
-        if (!isUpdate) {
-            pstmt.setInt(paramIndex++, UserSession.getInstance().getUserId());
-        }
-
-        pstmt.setString(paramIndex++, titleField.getText());
-        pstmt.setString(paramIndex++, genreField.getText());
-        pstmt.setString(paramIndex++, developerField.getText());
-        pstmt.setString(paramIndex++, publisherField.getText());
-        pstmt.setString(paramIndex++, platformsField.getText());
-        pstmt.setString(paramIndex++, translatorsArea.getText());
-        pstmt.setString(paramIndex++, steamidField.getText());
-        pstmt.setInt(paramIndex++, year);
-        pstmt.setString(paramIndex++, playtimeField.getText());
-        pstmt.setString(paramIndex++, formatField.getText());
-        pstmt.setString(paramIndex++, languageField.getText());
-        pstmt.setInt(paramIndex++, rating);
-        pstmt.setString(paramIndex++, tagsArea.getText());
-        pstmt.setString(paramIndex++, status);
-
-        if (isUpdate) {
-            pstmt.setInt(paramIndex, duzenlenecekOyun.getId());
-        }
+    /** Parses an already-validated numeric field; empty means 0. */
+    private int tamSayi(String metin) {
+        return (metin == null || metin.trim().isEmpty()) ? 0 : Integer.parseInt(metin.trim());
     }
 
     @FXML
     void handleIptal(ActionEvent event) {
         closeWindow();
     }
-    
+
     private void closeWindow() {
         ((Stage) kaydetButton.getScene().getWindow()).close();
-    }
-
-    private void showAlert(Alert.AlertType alertType, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }

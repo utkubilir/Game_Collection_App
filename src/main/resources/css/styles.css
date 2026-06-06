@@ -1,0 +1,52 @@
+/* Application-wide theme. Inline styles in FXML still override these where set. */
+
+.root {
+    -fx-font-family: "System";
+    -fx-font-size: 13px;
+    -fx-background-color: #ffffff;
+}
+
+/* Default buttons (colored buttons keep their inline style). */
+.button {
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 6 12 6 12;
+}
+
+.button:hover {
+    -fx-opacity: 0.92;
+}
+
+/* Tables */
+.table-view {
+    -fx-background-radius: 6;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f1f3f5;
+}
+
+.table-view .column-header .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #cfe2ff;
+    -fx-text-fill: #000000;
+}
+
+/* Text inputs */
+.text-field, .password-field, .text-area, .combo-box {
+    -fx-background-radius: 5;
+}
+
+.text-field:focused, .password-field:focused, .combo-box:focused {
+    -fx-border-color: #2d6cdf;
+    -fx-border-radius: 5;
+}
+
+/* Menu bar */
+.menu-bar {
+    -fx-background-color: #f8f9fa;
+}

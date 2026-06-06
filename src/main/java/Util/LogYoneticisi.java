@@ -1,24 +1,26 @@
 package Util;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import Dao.LogDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * Thin facade over {@link LogDao} for writing activity-log entries.
+ * Logging must never break the user's action, so failures are logged, not propagated.
+ */
 public class LogYoneticisi {
 
+    private static final Logger log = LoggerFactory.getLogger(LogYoneticisi.class);
+    private static final LogDao logDao = new LogDao();
+
+    private LogYoneticisi() {
+    }
+
     public static void logla(int kullaniciId, String mesaj) {
-        String sql = "INSERT INTO kullanici_loglari (kullanici_id, log_mesaji) VALUES (?, ?)";
-        
-        try (Connection conn = VeritabaniBaglantisi.baglan();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, kullaniciId);
-            pstmt.setString(2, mesaj);
-            pstmt.executeUpdate();
-
-        } catch (SQLException e) {
-            System.err.println("Log kaydedilirken veritabanı hatası oluştu.");
-            e.printStackTrace();
+        try {
+            logDao.ekle(kullaniciId, mesaj);
+        } catch (RuntimeException e) {
+            log.warn("Aktivite logu kaydedilemedi (kullanıcı {}): {}", kullaniciId, mesaj, e);
         }
     }
 }
